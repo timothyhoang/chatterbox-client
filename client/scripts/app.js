@@ -44,7 +44,7 @@ $(document).ready(function() {
     $.ajax({
       type: 'GET',
       url: app.server,
-      data: {limit: 1000},
+      data: {limit: 500},
       dataType: 'json',
       success: function (data) {
         console.log('chatterbox: Data retrieved');
