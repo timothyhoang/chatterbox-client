@@ -5,7 +5,7 @@ body {
     font-family: arial, sans-serif;
 }
 
-#main, #chats {
+#main, #chats, .message-bar {
     width: 500px;
     margin: auto;
     text-align: left;
@@ -87,4 +87,5 @@ form input[type=text] {
     color: #fff;
     background-color: #0090da;
 }
+
 

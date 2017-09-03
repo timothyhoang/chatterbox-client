@@ -28,10 +28,15 @@
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
     </div>
-    <select id="roomSelect"></select>
-    <div id="send">
-      <input type="text" id="formMessage">
-      <button type="submit" class="submit">submit</button>
+    <div class="message-bar">
+      <select id="roomSelect"></select>
+      <select id="friendSelect"></select>
+      <div id="send">
+        <form class="submit">
+          <input type="text" id="message">
+          <input type="submit" value="Submit">
+        </form>
+      </div>
     </div>
     <div id="chats"></div>
   </body>
