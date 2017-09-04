@@ -3,7 +3,7 @@ app = {};
 /* Initialize application and auto-fetch messages from server */
 app.init = function() {
   this.server = 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages';
-  this.username = location.search.split('=')[1];
+  this.username = location.search.split('=')[1].replace(/%20/, ' ');
   this.chatrooms = {lobby: true};
   this.friends = {all: true};
   this.specialCharactersRegexp = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*/;
@@ -163,6 +163,10 @@ $(document).ready(function() {
     e.preventDefault();
   });
   
+  $('#roomSelect-add-button').click(function() {
+    $('#roomSelect-add-form').toggle('display');
+  });
+
   $('#roomSelect').change(function() {
     var roomname = $('#roomSelect').val();
     $('.chat').css('display', 'none');
@@ -175,6 +179,12 @@ $(document).ready(function() {
     $('#room').val('');
     $('#roomSelect').val(roomname);
     return false;
+  });
+
+  $('#friendSelect').change(function() {
+    var username = $('#friendSelect').val();
+    $('.chat').css('display', 'none');
+    $(`.chat.${username}`).css('display', 'block');
   });
 
   $('#send .submit').submit(function() {

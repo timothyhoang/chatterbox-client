@@ -26,26 +26,9 @@
   <body>
     <div id="main">
       <h1>chatterbox</h1>
-      <!-- Your HTML goes here! -->
     </div>
 
-    <div id="roomSelect-bar">
-      <a>rooms:</a>
-      <select id="roomSelect">
-        <option selected="selected">lobby</option>
-      </select>
-      <form class="submit">
-        <input type="text" id="room">
-        <input type="submit" value="add room">
-      </form>
-    </div>
-
-    <div id="friendSelect-bar">
-      <a>friends:</a>
-      <select id="friendSelect">
-        <option selected="selected">all</option>
-      </select>
-    </div>
+    <div id="chats"></div>
 
     <div id="send">
       <form class="submit">
@@ -54,6 +37,30 @@
       </form>
     </div>
 
-    <div id="chats"></div>
+    <div class="nav">
+      <div class="select-nav">
+        <a>rooms:</a>
+        <select id="roomSelect">
+          <option selected="selected">lobby</option>
+        </select>
+        <button id="roomSelect-add-button">+</button>
+      </div>
+      <div id="roomSelect-add-form">
+        <form class="submit">
+          <input type="text" id="room">
+          <input type="submit" value="add room">
+        </form>
+      </div>
+    </div>
+
+    <div class="nav">
+      <div class="select-nav">
+        <a>friends:</a>
+        <select id="friendSelect">
+          <option selected="selected">all</option>
+        </select>
+      </div>
+    </div>
+
   </body>
 </html>
