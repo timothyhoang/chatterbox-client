@@ -5,7 +5,7 @@ body {
     font-family: arial, sans-serif;
 }
 
-#main, #chats, .message-bar {
+#main, #chats, #roomSelect-bar, #friendSelect-bar, #send {
     width: 500px;
     margin: auto;
     text-align: left;

@@ -1,15 +1,17 @@
-// YOUR CODE HERE:
 app = {};
 
+/* Initialize application and auto-fetch messages from server */
 app.init = function() {
   this.server = 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages';
   this.username = location.search.split('=')[1];
-  this.chatrooms = {};
-  this.friends = {};
-  this.currentChatroom = 'lobby';
+  this.chatrooms = {lobby: true};
+  this.friends = {all: true};
+  this.specialCharactersRegexp = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*/;
+
   this.autoUpdate();
 };
 
+/* Send a message in JSON format to the server - check spec for message structure */
 app.send = function(message) {
   $.ajax({
     type: 'POST',
@@ -25,6 +27,7 @@ app.send = function(message) {
   });
 };
 
+/* Fetch messages from server and render them on DOM */
 app.fetch = function() {
   var app = this;
   
@@ -35,8 +38,7 @@ app.fetch = function() {
     dataType: 'json',
     success: function (data) {
       console.log('chatterbox: Data retrieved');
-      app.clearMessages.bind(app)();
-      app.renderMessages.bind(app)(data.results);
+      app.updateFeed.bind(app)(data.results);
     },
     error: function (data) {
       console.error('chatterbox: Failed to retrieve data', data);
@@ -44,45 +46,92 @@ app.fetch = function() {
   });
 };
 
+/* Clear chat messages from the DOM */
 app.clearMessages = function() {
   $('#chats').empty();
 };
 
-app.renderMessages = function(messages) {
+/* Sanitize text to be used in HTML element */
+app.sanitizeElement = function(element) {
+  return element.replace(this.specialCharactersRegexp, '').split(' ').join('-');
+};
+
+/* Sanitize text */
+app.sanitizeText = function(text) {
+  return text.replace(this.specialCharactersRegexp, '');
+};
+
+/* Appends messages to DOM */
+app.updateFeed = function(messages) {
+  app.clearMessages.bind(app)();
+
   for (message of messages) {
-    var roomName = message.roomname;
-    if (roomName && roomName.length > 0) {
-      this.renderRoom(encodeURI(message.roomname));
-      this.renderMessage(message);
+    if (message.username && message.text && message.roomname) {
+      message.username = this.sanitizeElement(message.username).toLowerCase();
+      message.text = this.sanitizeText(message.text);
+      message.roomname = this.sanitizeElement(message.roomname).toLowerCase();
+
+      if (!this.chatrooms.hasOwnProperty(message.roomname)) {
+        this.renderRoom(message.roomname);
+      }
+
+      var currentRoom = $('#roomSelect').val();
+      var currentFriend = $('#friendSelect').val();
+      if ((currentRoom === 'lobby' || currentRoom === message.roomname) && (currentFriend === 'all' || currentFriend === message.username)) {
+        this.renderMessage(message);
+      }
     }
   }
 };
 
-app.renderMessage = function(message) {
-  var userName = encodeURI(message.username);
-  var text = encodeURI(message.text);
-    
-  // if (message.username === userName && message.text === text && message.roomname === roomName) {
-  var $element = $(`<div class="chat ${message.roomname}"></div>`);
-  if (this.friends.hasOwnProperty(userName)) {
-    $element = $(`<div class="chat ${message.roomname} friend"></div>`);
-  }
-  $element.append(`<a class="username" href="#">${encodeURI(message.username).toString().replace(/%20/g, ' ')}</a>`);
-  $element.append(`<div>${encodeURI(message.text).toString().replace(/%20/g, ' ')}</div>`);
-  $('#chats').append($element);
-  // }
+/* Get base chat DOM node */
+app.getChatContainer = function() {
+  return $(`<div class="chat"></div>`);
 };
 
-app.renderRoom = function(roomName) {
-  if (!this.chatrooms.hasOwnProperty(roomName)) {
-    this.chatrooms[roomName] = true;
-    roomName = roomName.split(' ').join('-');
-    var $element = $(`<option id="${roomName}">${roomName}</option>`);
+/* Get add friend class to DOM node if username is on friends list */
+app.addFriendClassToChatContainer = function($element, username) {
+  if (this.friends.hasOwnProperty(username)) {
+    $element.addClass('friend');
+  }
+};
+
+/* Get chatroom name to chat DOM node */
+app.addRoomnameClassToChatContainer = function($element, roomname) {
+  $element.addClass(roomname);
+};
+
+/* Add username element inside of chat DOM node */
+app.addUsernameElementInChatContainer = function($element, username) {
+  $element.append(`<a class="username" href="#">${username}</a>`);
+};
+
+/* Add text element inside of chat DOM node */
+app.addTextElementInChatContainer = function($element, text) {
+  $element.append(`<div>${text}</div>`);
+};
+
+/* Parses message, wraps chat message in an element, appends to DOM */
+app.renderMessage = function(message) {    
+  var $message = this.getChatContainer();
+  this.addFriendClassToChatContainer($message, message.username);
+  this.addRoomnameClassToChatContainer($message, message.roomname);
+  this.addUsernameElementInChatContainer($message, message.username);
+  this.addTextElementInChatContainer($message, message.text);
+  $('#chats').append($message);
+};
+
+/* Add a room to the list of chatrooms and render on DOM */
+app.renderRoom = function(roomname) {
+  if (!this.chatrooms.hasOwnProperty(roomname)) {
+    this.chatrooms[roomname] = true;
+    var $element = $(`<option id="${roomname}">${roomname}</option>`);
     $('#roomSelect').append($element);
   }
 };
 
-app.handleUsernameClick = function(username) {
+/* Adds username clicked to friends list */
+app.handleusernameClick = function(username) {
   if (!this.friends.hasOwnProperty(username)) {
     this.friends[username] = true;
     var $element = $(`<option id="${username}">${username}</option>`);
@@ -91,6 +140,7 @@ app.handleUsernameClick = function(username) {
   this.fetch();
 };
 
+/* Handles submission of chat messages by user */
 app.handleSubmit = function() {
   var message = {};
   message.username = this.username;
@@ -101,22 +151,30 @@ app.handleSubmit = function() {
   this.fetch();
 };
 
+/* Auto fetches messages from server at set interval */
 app.autoUpdate = function () {
-  setTimeout(this.autoUpdate.bind(this), 5000);
+  setTimeout(this.autoUpdate.bind(this), 2000);
   this.fetch();
 };
 
 $(document).ready(function() {  
   $(document).on('click', '.username', function(e) {
-    app.handleUsernameClick(encodeURI($(this).text()));
+    app.handleusernameClick($(this).text());
     e.preventDefault();
   });
   
-  
   $('#roomSelect').change(function() {
-    var roomName = $('#roomSelect').val();
+    var roomname = $('#roomSelect').val();
     $('.chat').css('display', 'none');
-    $(`.chat.${roomName}`).css('display', 'block');
+    $(`.chat.${roomname}`).css('display', 'block');
+  });
+
+  $('#roomSelect-bar .submit').submit(function() {
+    var roomname = app.sanitizeElement($('#room').val());
+    app.renderRoom(roomname);
+    $('#room').val('');
+    $('#roomSelect').val(roomname);
+    return false;
   });
 
   $('#send .submit').submit(function() {

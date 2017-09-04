@@ -28,16 +28,32 @@
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
     </div>
-    <div class="message-bar">
-      <select id="roomSelect"></select>
-      <select id="friendSelect"></select>
-      <div id="send">
-        <form class="submit">
-          <input type="text" id="message">
-          <input type="submit" value="Submit">
-        </form>
-      </div>
+
+    <div id="roomSelect-bar">
+      <a>rooms:</a>
+      <select id="roomSelect">
+        <option selected="selected">lobby</option>
+      </select>
+      <form class="submit">
+        <input type="text" id="room">
+        <input type="submit" value="add room">
+      </form>
     </div>
+
+    <div id="friendSelect-bar">
+      <a>friends:</a>
+      <select id="friendSelect">
+        <option selected="selected">all</option>
+      </select>
+    </div>
+
+    <div id="send">
+      <form class="submit">
+        <input type="text" id="message">
+        <input type="submit" value="submit">
+      </form>
+    </div>
+
     <div id="chats"></div>
   </body>
 </html>
