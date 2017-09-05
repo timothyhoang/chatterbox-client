@@ -5,6 +5,18 @@ body {
     font-family: arial, sans-serif;
 }
 
+#chats {
+    width: 500px;
+    height: 500px;
+    margin: auto;
+    text-align: left;
+    background: white;
+    padding: 50px 60px;
+    border: solid #ddd;
+    border-width: 0 1px 1px 1px;
+    overflow: scroll;
+}
+
 #main, #send, #nav {
     width: 500px;
     margin: auto;
@@ -46,16 +58,8 @@ body {
     line-height: 13px;
 }
 
-#chats {
-    width: 500px;
-    height: 500px;
-    margin: auto;
-    text-align: left;
-    background: white;
-    padding: 50px 60px;
-    border: solid #ddd;
-    border-width: 0 1px 1px 1px;
-    overflow: scroll;
+#roomSelect-add-form {
+    display: none;
 }
 
 #send {
@@ -124,6 +128,6 @@ form input[type=text] {
     background-color: #02a5f9;
 }
 
-#roomSelect-add-form {
-    display: none;
+.delete-button {
+    float: right;
 }

@@ -46,6 +46,23 @@ app.fetch = function() {
   });
 };
 
+/* Deletes messages on the server */
+app.delete = function(objectId) {
+  var app = this;
+  
+  $.ajax({
+    type: 'DELETE',
+    url: `${app.server}/${objectId}`,
+    success: function (data) {
+      console.log('chatterbox: Data deleted');
+      app.fetch();
+    },
+    error: function (data) {
+      console.error('chatterbox: Failed to delete data', data);
+    }
+  });
+};
+
 /* Clear chat messages from the DOM */
 app.clearMessages = function() {
   $('#chats').empty();
@@ -89,34 +106,40 @@ app.getChatContainer = function() {
   return $(`<div class="chat"></div>`);
 };
 
-/* Get add friend class to DOM node if username is on friends list */
+/* Get add friend class to DOM element if username is on friends list */
 app.addFriendClassToChatContainer = function($element, username) {
   if (this.friends.hasOwnProperty(username)) {
     $element.addClass('friend');
   }
 };
 
-/* Get chatroom name to chat DOM node */
+/* Get chatroom name to chat DOM element */
 app.addRoomnameClassToChatContainer = function($element, roomname) {
   $element.addClass(roomname);
 };
 
-/* Add username element inside of chat DOM node */
+/* Add username element inside of chat DOM element */
 app.addUsernameElementInChatContainer = function($element, username) {
   $element.append(`<a class="username" href="#">${username}</a>`);
 };
 
-/* Add text element inside of chat DOM node */
+/* Add a delete button inside of chat DOM element */
+app.addDeleteButtonInChatContainer = function($element, objectId) {
+  $element.append(`<button class="delete-button" id="${objectId}">x</button>`);
+};
+
+/* Add text element inside of chat DOM element */
 app.addTextElementInChatContainer = function($element, text) {
   $element.append(`<div>${text}</div>`);
 };
 
 /* Parses message, wraps chat message in an element, appends to DOM */
-app.renderMessage = function(message) {    
+app.renderMessage = function(message) {
   var $message = this.getChatContainer();
   this.addFriendClassToChatContainer($message, message.username);
   this.addRoomnameClassToChatContainer($message, message.roomname);
   this.addUsernameElementInChatContainer($message, message.username);
+  this.addDeleteButtonInChatContainer($message, message.objectId);
   this.addTextElementInChatContainer($message, message.text);
   $('#chats').append($message);
 };
@@ -162,7 +185,16 @@ $(document).ready(function() {
     app.handleusernameClick($(this).text());
     e.preventDefault();
   });
+
+  $(document).on('click', '.delete-button', function() {
+    app.delete($(this).attr('id'));
+  });
   
+  $('#send .submit').submit(function() {
+    app.handleSubmit();
+    return false;
+  });
+
   $('#roomSelect-add-button').click(function() {
     $('#roomSelect-add-form').toggle('display');
   });
@@ -185,11 +217,6 @@ $(document).ready(function() {
     var username = $('#friendSelect').val();
     $('.chat').css('display', 'none');
     $(`.chat.${username}`).css('display', 'block');
-  });
-
-  $('#send .submit').submit(function() {
-    app.handleSubmit();
-    return false;
   });
   
   app.init();
