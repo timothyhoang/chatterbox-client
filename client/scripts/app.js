@@ -174,9 +174,40 @@ app.handleSubmit = function() {
   this.fetch();
 };
 
+/* Handles selection of chat rooms */
+app.handleSelectingRooms = function() {
+  var roomname = $('#roomSelect').val();
+  $('.chat').css('display', 'none');
+  $(`.chat.${roomname}`).css('display', 'block');
+};
+
+/* Handles addition of chat rooms */
+app.handleAddingRooms = function() {
+  var roomname = app.sanitizeElement($('#room').val());
+  app.renderRoom(roomname);
+  $('#room').val('');
+  $('#roomSelect').val(roomname);
+};
+
+/* Handles seletion of friends */
+app.handleSelectingFriends = function() {
+  var username = $('#friendSelect').val();
+  $('.chat').css('display', 'none');
+  $(`.chat.${username}`).css('display', 'block');
+};
+
+/* Handles removal of friends */
+app.handleRemovingFriends = function(username) {
+  var username = app.sanitizeElement($('#friend').val());
+  $('#friend').val('');
+  $('#friendSelect').val('all');
+  delete this.friends[username];
+  $(`#${username}`).remove();
+};
+
 /* Auto fetches messages from server at set interval */
 app.autoUpdate = function () {
-  setTimeout(this.autoUpdate.bind(this), 2000);
+  // setTimeout(this.autoUpdate.bind(this), 2000);
   this.fetch();
 };
 
@@ -199,24 +230,26 @@ $(document).ready(function() {
     $('#roomSelect-add-form').toggle('display');
   });
 
-  $('#roomSelect').change(function() {
-    var roomname = $('#roomSelect').val();
-    $('.chat').css('display', 'none');
-    $(`.chat.${roomname}`).css('display', 'block');
+  $('#friendSelect-remove-button').click(function() {
+    $('#friendSelect-remove-form').toggle('display');
   });
 
-  $('#roomSelect-bar .submit').submit(function() {
-    var roomname = app.sanitizeElement($('#room').val());
-    app.renderRoom(roomname);
-    $('#room').val('');
-    $('#roomSelect').val(roomname);
+  $('#roomSelect').change(function() {
+    app.handleSelectingRooms();
+  });
+
+  $('#roomSelect-add-form .submit').submit(function() {
+    app.handleAddingRooms();
     return false;
   });
 
   $('#friendSelect').change(function() {
-    var username = $('#friendSelect').val();
-    $('.chat').css('display', 'none');
-    $(`.chat.${username}`).css('display', 'block');
+    app.handleSelectingFriends();
+  });
+
+  $('#friendSelect-remove-form .submit').submit(function() {
+    app.handleRemovingFriends();
+    return false;
   });
   
   app.init();
