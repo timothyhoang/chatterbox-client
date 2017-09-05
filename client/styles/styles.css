@@ -22,9 +22,9 @@ body {
     margin: auto;
     text-align: left;
     background: white;
-    padding: 50px 60px;
+    padding: 50px 60px 25px 60px;
     border: solid #ddd;
-    border-width: 0 1px 1px 1px;
+    border-width: 0 1px;
 }
 
 #main h1 {
@@ -134,4 +134,33 @@ form input[type=text] {
 
 .delete-button {
     float: right;
+}
+
+div#chatroom-tabs {
+    overflow: hidden;
+    background-color: #f1f1f1;
+    width: 500px;
+    margin: auto;
+    background: white;
+    padding: 0 60px;
+    border: solid #ddd;
+    border-width: 0 0 1px 0;
+}
+
+div#chatroom-tabs button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+}
+
+div#chatroom-tabs button:hover {
+    background-color: #ddd;
+}
+
+div#chatroom-tabs button.active {
+    background-color: #ccc;
 }

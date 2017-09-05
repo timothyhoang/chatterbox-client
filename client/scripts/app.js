@@ -8,6 +8,8 @@ app.init = function() {
   this.friends = {all: true};
   this.specialCharactersRegexp = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*/;
 
+  $('#lobby-tablink').click();
+
   this.autoUpdate();
 };
 
@@ -148,8 +150,12 @@ app.renderMessage = function(message) {
 app.renderRoom = function(roomname) {
   if (!this.chatrooms.hasOwnProperty(roomname)) {
     this.chatrooms[roomname] = true;
-    var $element = $(`<option id="${roomname}">${roomname}</option>`);
-    $('#roomSelect').append($element);
+    
+    var $option = $(`<option id="${roomname}">${roomname}</option>`);
+    $('#roomSelect').append($option);
+    
+    var $tab = $(`<button id="${roomname}-tablink" class="tablinks" value="${roomname}">${roomname}</button>`);
+    $('#chatroom-tabs').append($tab);
   }
 };
 
@@ -172,6 +178,14 @@ app.handleSubmit = function() {
   this.send(JSON.stringify(message));
   $('#message').val(''); 
   this.fetch();
+};
+
+/* Handles selection of chat room tabs */
+app.handleSelectingTabs = function(roomname) {
+  var roomname = $('.tablinks.active').val();
+  $('#roomSelect').val(roomname);
+  $('.chat').css('display', 'none');
+  $(`.chat.${roomname}`).css('display', 'block');
 };
 
 /* Handles selection of chat rooms */
@@ -207,7 +221,7 @@ app.handleRemovingFriends = function(username) {
 
 /* Auto fetches messages from server at set interval */
 app.autoUpdate = function () {
-  // setTimeout(this.autoUpdate.bind(this), 2000);
+  setTimeout(this.autoUpdate.bind(this), 2000);
   this.fetch();
 };
 
@@ -221,6 +235,12 @@ $(document).ready(function() {
     app.delete($(this).attr('id'));
   });
   
+  $(document).on('click', '.tablinks', function() {
+    $('.tablinks').removeClass('active');
+    $(this).addClass('active');
+    app.handleSelectingTabs($(this).val());
+  });
+
   $('#send .submit').submit(function() {
     app.handleSubmit();
     return false;
